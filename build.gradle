@@ -1,63 +1,62 @@
 plugins {
-    id 'fabric-loom' version "$loom_version"
-    id 'maven-publish'
+    id 'architectury-plugin' version "$architectury_plugin_version"
+    id 'dev.architectury.loom' version "$loom_version" apply false
+    id 'com.github.johnrengelman.shadow' version "$shadow_version"
+    id 'java'
 }
 
-version = project.mod_version + "+" + project.minecraft_version
-group = project.maven_group
-
-base {
-    archivesName = project.archives_base_name
+architectury {
+    minecraft = rootProject.minecraft_version
 }
 
-repositories {
-    maven { url 'https://api.modrinth.com/maven' }
-}
+subprojects {
+    apply plugin: 'com.github.johnrengelman.shadow'
+    apply plugin: 'dev.architectury.loom'
+    apply plugin: 'architectury-plugin'
+    apply plugin: 'maven-publish'
 
-dependencies {
-    minecraft "com.mojang:minecraft:$minecraft_version"
-    mappings loom.officialMojangMappings()
-    modImplementation "net.fabricmc:fabric-loader:$loader_version"
-    modImplementation "net.fabricmc.fabric-api:fabric-api:$fabric_version"
+    version "${mod_version}+${minecraft_version}"
+    group maven_group
 
-    // Others
-    modCompileOnly "maven.modrinth:sodium:$sodium_version"
-}
+    archivesBaseName = rootProject.archivesBaseName + '-' + name
+    loom.silentMojangMappingsLicense()
 
-processResources {
-    inputs.property "version", project.version
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(17)
+        }
 
-    filesMatching("fabric.mod.json") {
-        expand "version": project.version
+        withSourcesJar()
     }
-}
 
-tasks.withType(JavaCompile).configureEach {
-    it.options.release = 17
-}
-
-java {
-    withSourcesJar()
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-}
-
-publishing {
     repositories {
-        maven {
-            name 'Lazurite'
-            url 'https://lazurite.dev/releases'
-            credentials(PasswordCredentials)
-            authentication {
-                register("basic", BasicAuthentication)
+        maven { url 'https://lazurite.dev/releases' }
+        maven { url 'https://api.modrinth.com/maven' }
+        mavenLocal()
+    }
+
+    dependencies {
+        minecraft "com.mojang:minecraft:$minecraft_version"
+        mappings loom.officialMojangMappings()
+    }
+
+    publishing {
+        repositories {
+            maven {
+                name 'Lazurite'
+                url 'https://lazurite.dev/releases'
+                credentials(PasswordCredentials)
+                authentication {
+                    register("basic", BasicAuthentication)
+                }
             }
         }
-    }
 
-    publications {
-        "${project.name}"(MavenPublication) {
-            artifactId = archivesBaseName
-            from components.java
+        publications {
+            "${project.name}"(MavenPublication) {
+                artifactId = archivesBaseName
+                from components.java
+            }
         }
     }
 }

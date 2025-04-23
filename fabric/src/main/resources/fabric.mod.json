@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "transporter",
+  "version": "${version}",
+
+  "name": "Transporter",
+  "description": "Beam model info to the server.",
+  "authors": [ "The Lazurite Team" ],
+  "contact": {
+    "homepage": "https://lazurite.dev",
+    "sources": "https://github.com/LazuriteMC/Transporter",
+    "issues": "https://github.com/LazuriteMC/Transporter/issues"
+  },
+
+  "license": "MIT",
+  "environment": "*",
+  "icon": "icon.png",
+
+  "entrypoints": {
+    "main": [ "dev.lazurite.transporter.fabric.TransporterFabric" ]
+  },
+
+  "depends": {
+    "minecraft": ">=1.19",
+    "fabricloader": ">=0.14"
+  },
+
+  "custom": {
+    "modmenu": {
+      "badges": [ "library" ],
+      "links": {
+        "modmenu.discord": "https://discord.gg/NNPPHN7b3P"
+      }
+    }
+  }
+}
